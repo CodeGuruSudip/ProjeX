@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import ProjectForm from '../components/ProjectForm';
 import ProjectItem from '../components/ProjectItem';
 import Spinner from '../components/Spinner';
@@ -16,15 +17,28 @@ function Dashboard() {
   );
 
   useEffect(() => {
-    if (isError) {
-      console.log(message);
-    }
-
     if (!user) {
+      console.log('No user found, redirecting to login');
       navigate('/login');
+      return;
     }
 
-    dispatch(getProjects());
+    if (isError) {
+      console.error('Error:', message);
+      toast.error(message);
+      return;
+    }
+
+    console.log('Fetching projects...');
+    dispatch(getProjects())
+      .unwrap()
+      .then((projects) => {
+        console.log('Projects fetched:', projects);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch projects:', error);
+        toast.error('Failed to load projects');
+      });
 
     return () => {
       dispatch(reset());
