@@ -10,24 +10,45 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 // Database connection with retry logic
-let isConnected = false;
+let cachedDb = null;
 const connectToDatabase = async () => {
-  if (isConnected) {
-    console.log('Using existing database connection');
+  if (cachedDb) {
+    console.log('Using cached database connection');
     return;
   }
 
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    // Close any existing connection
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+    }
+
+    const connection = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      bufferCommands: false,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     });
-    isConnected = true;
-    console.log('Database connection established');
+
+    cachedDb = connection;
+    console.log('New database connection established');
+    
+    // Handle connection errors
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+      cachedDb = null;
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+      cachedDb = null;
+    });
+
+    return cachedDb;
   } catch (error) {
     console.error('Database connection error:', error);
+    cachedDb = null;
     throw error;
   }
 };
@@ -92,6 +113,11 @@ if (process.env.NODE_ENV === 'production') {
 // Error handler must be after all routes
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Export the app for serverless deployment
+module.exports = app;
