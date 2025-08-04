@@ -4,11 +4,12 @@
   "description": "A comprehensive project management tool with features like task management, team collaboration, and project tracking.",
   "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "server": "nodemon backend/server.js",
+    "start": "node server.js",
+    "server": "nodemon server.js",
     "client": "npm start --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
+    "build": "cd frontend && npm install && npm run build",
+    "vercel-build": "npm install && cd frontend && npm install && npm run build"
   },
   "author": "Cascade",
   "license": "ISC",
