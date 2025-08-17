@@ -1,0 +1,6 @@
+{
+  "name": "build-script",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
+  }
+}

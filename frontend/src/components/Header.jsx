@@ -46,6 +46,25 @@ function Header() {
               <Link to='/calendar'>Calendar</Link>
             </li>
             <li>
+              <Link to='/profile'>
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt="Profile"
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      marginRight: '5px'
+                    }}
+                  />
+                ) : (
+                  <FaUser />
+                )}
+                Profile
+              </Link>
+            </li>
+            <li>
               <button className='btn' onClick={onLogout}>
                 <FaSignOutAlt /> Logout
               </button>
