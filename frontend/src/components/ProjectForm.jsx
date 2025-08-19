@@ -17,7 +17,7 @@ function ProjectForm() {
   };
 
   return (
-    <section className='form'>
+    <section className='form card' style={{ marginBottom: 32 }}>
       <form onSubmit={onSubmit}>
         <div className='form-group'>
           <label htmlFor='name'>Project Name</label>

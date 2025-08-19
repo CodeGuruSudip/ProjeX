@@ -4,6 +4,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { getMyTasks } from '../features/tasks/taskSlice';
+import '../styles/Calendar.css'; // Add custom styles for animation
 
 const localizer = momentLocalizer(moment);
 
@@ -15,7 +16,9 @@ const CalendarPage = () => {
     dispatch(getMyTasks());
   }, [dispatch]);
 
-  const events = (tasks || [])
+  // Defensive: ensure tasks is always an array
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const events = safeTasks
     .filter((task) => task.dueDate)
     .map(task => ({
       title: task.name,
@@ -29,8 +32,13 @@ const CalendarPage = () => {
     return <h2>Loading...</h2>;
   }
 
+  // Custom event style for animation
+  const eventPropGetter = () => ({
+    className: 'calendar-event-animated',
+  });
+
   return (
-    <div className='container'>
+    <div className='container calendar-fade-in'>
       <h1 className='heading'>Project Calendar</h1>
       <div style={{ height: '70vh' }}>
         <Calendar
@@ -39,6 +47,7 @@ const CalendarPage = () => {
           startAccessor="start"
           endAccessor="end"
           style={{ margin: '20px 0' }}
+          eventPropGetter={eventPropGetter}
         />
       </div>
     </div>

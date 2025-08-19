@@ -1,0 +1,48 @@
+.calendar-fade-in {
+  animation: fadeInCalendar 1s ease;
+}
+
+@keyframes fadeInCalendar {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.calendar-event-animated {
+  transition: box-shadow 0.3s, transform 0.3s, background 0.3s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.07);
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  color: var(--primary, #2563eb);
+  font-weight: 500;
+}
+
+.calendar-event-animated:hover {
+  background: var(--accent, #fbbf24) !important;
+  color: var(--primary, #2563eb) !important;
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px rgba(251,191,36,0.18);
+  z-index: 2;
+}
+
+.rbc-calendar {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(37,99,235,0.08);
+  background: var(--card-bg, #fff);
+  padding: 16px;
+  margin-bottom: 2rem;
+  animation: fadeInCalendar 1s;
+}
+.rbc-toolbar button {
+  border-radius: 999px;
+  background: var(--primary, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+.rbc-toolbar button:hover, .rbc-toolbar button:focus {
+  background: var(--accent, #fbbf24);
+  color: var(--primary, #2563eb);
+}
+.rbc-today {
+  background: linear-gradient(90deg, #e0e7ff 0%, #fbbf24 100%) !important;
+}

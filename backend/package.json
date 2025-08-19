@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "project-management-tool": "file:.."
+  }
+}

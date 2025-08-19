@@ -20,11 +20,17 @@ const Task = ({ task, index }) => {
             style={{
               userSelect: 'none',
               padding: '16px',
-              margin: '0 0 8px 0',
+              margin: '0 0 12px 0',
               minHeight: '50px',
-              backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
-              color: 'white',
+              backgroundColor: snapshot.isDragging ? 'var(--accent, #fbbf24)' : 'var(--primary, #2563eb)',
+              color: snapshot.isDragging ? 'var(--primary, #2563eb)' : '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(37,99,235,0.10)',
               cursor: 'pointer',
+              fontWeight: 500,
+              fontSize: '1rem',
+              transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+              transform: snapshot.isDragging ? 'scale(1.04)' : 'scale(1)',
               ...provided.draggableProps.style,
             }}
           >

@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Project from './pages/Project';
 import CalendarPage from './pages/CalendarPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path='/register' element={<Register />} />
             <Route path='/project/:projectId' element={<Project />} />
             <Route path='/calendar' element={<CalendarPage />} />
+            <Route path='/profile' element={<ProfilePage />} />
           </Routes>
         </div>
       </Router>

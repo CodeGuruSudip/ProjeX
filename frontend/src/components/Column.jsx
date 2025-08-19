@@ -4,17 +4,19 @@ import Task from './Task';
 
 const Column = ({ column, tasks }) => {
   return (
-    <div style={{ margin: '8px', border: '1px solid lightgrey', borderRadius: '2px', width: '30%' }}>
-      <h3 style={{ padding: '8px' }}>{column.title}</h3>
+    <div className='card' style={{ margin: '8px', borderRadius: '18px', width: '30%', background: 'var(--card-bg, #fff)', boxShadow: 'var(--shadow, 0 4px 24px rgba(37,99,235,0.08))', transition: 'box-shadow 0.2s, transform 0.2s' }}>
+      <h3 style={{ padding: '8px', color: 'var(--primary, #2563eb)', fontWeight: 700 }}>{column.title}</h3>
       <Droppable droppableId={column.id}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
             style={{
-              background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
+              background: snapshot.isDraggingOver ? 'var(--accent, #fbbf24)' : '#f8fafc',
               padding: '8px',
               minHeight: '500px',
+              borderRadius: '12px',
+              transition: 'background 0.2s',
             }}
           >
             {tasks.map((task, index) => (
