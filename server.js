@@ -9,6 +9,14 @@ const mongoose = require('mongoose');
 // Load environment variables
 require('dotenv').config();
 
+// Fallback environment variables if .env file is missing
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'your_jwt_secret_key_here_change_this_in_production';
+}
+if (!process.env.MONGO_URI) {
+  process.env.MONGO_URI = 'mongodb://localhost:27017/projex';
+}
+
 // Database connection with retry logic
 let cachedDb = null;
 const connectToDatabase = async () => {
