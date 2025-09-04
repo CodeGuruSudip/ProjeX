@@ -11,10 +11,10 @@ require('dotenv').config();
 
 // Fallback environment variables if .env file is missing
 if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = 'your_jwt_secret_key_here_change_this_in_production';
+  process.env.JWT_SECRET = "d4a8b1c1-9e7f-4d3a-8c6b-2e9f0d1a8b3c-T8!z@q#E$r%T&y*U(i)O_p+L:k>J<hG?f";
 }
 if (!process.env.MONGO_URI) {
-  process.env.MONGO_URI = 'mongodb://localhost:27017/projex';
+  process.env.MONGO_URI = 'mongodb://localhost:27017/projex-db';
 }
 
 // Database connection with retry logic
@@ -86,6 +86,7 @@ app.use(cors({
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
   res.json({ status: 'ok', dbConnection: isConnected });
 });
 
