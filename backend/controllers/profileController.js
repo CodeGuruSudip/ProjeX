@@ -1,36 +1,40 @@
-const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
 
-// @desc    Update user profile (bio and/or profile picture)
+// @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-const updateProfile = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const { bio } = req.body;
-  let profilePicture;
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
 
-  if (req.file) {
-    // Save the path to the uploaded file
-    profilePicture = `/uploads/${req.file.filename}`;
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    // If a file was uploaded, update the profilePicture
+    if (req.file) {
+      user.profilePicture = req.file.path;
+    }
+
+    // Update other profile fields if provided
+    if (req.body.name) user.name = req.body.name;
+    if (req.body.email) user.email = req.body.email;
+    if (req.body.password) user.password = req.body.password;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
+    });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
   }
-
-  const updateFields = {};
-  if (bio !== undefined) updateFields.bio = bio;
-  if (profilePicture) updateFields.profilePicture = profilePicture;
-
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { $set: updateFields },
-    { new: true }
-  ).select('-password');
-
-  if (!updatedUser) {
-    res.status(404);
-    throw new Error('User not found');
-  }
-
-  res.json(updatedUser);
-});
+};
 
 module.exports = {
   updateProfile,

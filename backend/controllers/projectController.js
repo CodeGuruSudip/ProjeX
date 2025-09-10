@@ -2,6 +2,13 @@ const asyncHandler = require('express-async-handler');
 const Project = require('../models/projectModel');
 const User = require('../models/userModel');
 const Notification = require('../models/notificationModel');
+const {
+  logProjectCreated,
+  logProjectUpdated,
+  logMemberAdded,
+  logMemberRemoved,
+  logMemberRoleUpdated,
+} = require('./activityLogController');
 
 // @desc    Get projects
 // @route   GET /api/projects
@@ -29,6 +36,9 @@ const setProject = asyncHandler(async (req, res) => {
     owner: req.user.id,
     members: [{ user: req.user.id, role: 'Admin' }],
   });
+
+  // Log project creation activity
+  await logProjectCreated(req.user.id, project._id, project.name, req);
 
   res.status(201).json(project);
 });
@@ -59,6 +69,9 @@ const updateProject = asyncHandler(async (req, res) => {
   const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
+
+  // Log the project update activity
+  await logProjectUpdated(req.user.id, req.params.id, req.body, req);
 
   res.status(200).json(updatedProject);
 });
@@ -114,6 +127,9 @@ const addProjectMember = asyncHandler(async (req, res) => {
     link: `/project/${project._id}`,
   });
 
+  // Log member addition activity
+  await logMemberAdded(req.user.id, project._id, email, role, req);
+
   res.status(200).json(project.members);
 });
 
@@ -144,8 +160,13 @@ const updateMemberRole = asyncHandler(async (req, res) => {
   );
 
   if (member) {
+    const oldRole = member.role;
     member.role = role;
     await project.save();
+
+    // Log member role update activity
+    await logMemberRoleUpdated(req.user.id, project._id, user.email, oldRole, role, req);
+
     res.status(200).json(project.members);
   } else {
     res.status(404);

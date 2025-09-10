@@ -9,14 +9,26 @@ const storage = multer.diskStorage({
   },
 });
 
-// Init upload
-const upload = multer({
+// Init upload for profile pictures
+const uploadProfilePicture = multer({
   storage: storage,
   limits: { fileSize: 10000000 }, // 10MB limit
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },
 }).single('profilePicture'); // 'profilePicture' is the name of the input field
+
+// Init upload for task attachments
+const uploadAttachment = multer({
+  storage: storage,
+  limits: { fileSize: 10000000 }, // 10MB limit
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single('file'); // 'file' is the name of the input field for attachments
+
+module.exports = uploadProfilePicture;
+module.exports.uploadAttachment = uploadAttachment;
 
 // Check file type
 function checkFileType(file, cb) {
@@ -34,4 +46,3 @@ function checkFileType(file, cb) {
   }
 }
 
-module.exports = upload;

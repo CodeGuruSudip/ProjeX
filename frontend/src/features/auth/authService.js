@@ -29,10 +29,24 @@ const logout = () => {
   localStorage.removeItem('user');
 };
 
+// Update profile
+const updateProfile = async (formData, token) => {
+  const config = {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  const response = await axios.put('/api/users/profile', formData, config);
+  return response.data;
+};
+
 const authService = {
   register,
   logout,
   login,
+  updateProfile,
 };
 
 export default authService;

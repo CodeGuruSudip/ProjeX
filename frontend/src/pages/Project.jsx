@@ -6,6 +6,7 @@ import Spinner from '../components/Spinner';
 import TaskForm from '../components/TaskForm';
 import KanbanBoard from '../components/KanbanBoard';
 import MemberManager from '../components/MemberManager';
+import ActivityLog from '../components/ActivityLog';
 
 function Project() {
   const dispatch = useDispatch();
@@ -37,17 +38,44 @@ function Project() {
   }
 
   return (
-    <div className='container'>
-      <section className='heading'>
-        <h1>{project ? project.name : 'Project'}</h1>
-        <p>{project ? project.description : ''}</p>
-      </section>
+    <div className='modern-container'>
+      <div className="project-header">
+        <div className="project-info">
+          <h1 className="project-title">{project ? project.name : 'Project'}</h1>
+          <p className="project-description">{project ? project.description : ''}</p>
+        </div>
+        <div className="project-stats">
+          <div className="stat-item">
+            <span className="stat-number">{tasks.length}</span>
+            <span className="stat-label">Tasks</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-number">
+              {project ? project.members.length : 0}
+            </span>
+            <span className="stat-label">Members</span>
+          </div>
+        </div>
+      </div>
 
-      {project && <MemberManager project={project} />}
+      <div className="project-content">
+        <div className="project-main">
+          {project && <MemberManager project={project} />}
 
-      <TaskForm projectId={projectId} />
+          <div className="modern-card">
+            <TaskForm projectId={projectId} />
+          </div>
 
-      <KanbanBoard tasks={tasks} projectId={projectId} />
+          <div className="kanban-section">
+            <h2 className="section-title">Task Board</h2>
+            <KanbanBoard tasks={tasks} projectId={projectId} />
+          </div>
+        </div>
+
+        <div className="project-sidebar">
+          <ActivityLog projectId={projectId} />
+        </div>
+      </div>
     </div>
   );
 }

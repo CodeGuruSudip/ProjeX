@@ -9,14 +9,6 @@ const mongoose = require('mongoose');
 // Load environment variables
 require('dotenv').config();
 
-// Fallback environment variables if .env file is missing
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = "d4a8b1c1-9e7f-4d3a-8c6b-2e9f0d1a8b3c-T8!z@q#E$r%T&y*U(i)O_p+L:k>J<hG?f";
-}
-if (!process.env.MONGO_URI) {
-  process.env.MONGO_URI = 'mongodb://localhost:27017/projex-db';
-}
-
 // Database connection with retry logic
 let cachedDb = null;
 const connectToDatabase = async () => {
@@ -72,21 +64,21 @@ app.use(express.urlencoded({ extended: false }));
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// API routes
-app.use('/api/users', require('./backend/routes/userRoutes'));
-app.use('/api/projects', require('./backend/routes/projectRoutes'));
-app.use('/api/tasks', require('./backend/routes/taskRoutes'));
-app.use('/api/notifications', require('./backend/routes/notificationRoutes'));
-
 // CORS configuration
 app.use(cors({
   origin: ['https://proje-x-psi.vercel.app', 'http://localhost:3000'],
   credentials: true
 }));
 
+// API routes
+app.use('/api/users', require('./backend/routes/userRoutes'));
+app.use('/api/projects', require('./backend/routes/projectRoutes'));
+app.use('/api/tasks', require('./backend/routes/taskRoutes'));
+app.use('/api/notifications', require('./backend/routes/notificationRoutes'));
+app.use('/api/activity-logs', require('./backend/routes/activityLogRoutes'));
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  const isConnected = mongoose.connection.readyState === 1;
   res.json({ status: 'ok', dbConnection: isConnected });
 });
 

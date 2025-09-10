@@ -1,12 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import TaskModal from './TaskModal';
+import './Task.css';
 
-const Task = ({ task, index }) => {
+const Task = memo(({ task, index }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const handleOpenModal = () => setModalOpen(true);
-  const handleCloseModal = () => setModalOpen(false);
+  const handleOpenModal = useCallback(() => setModalOpen(true), []);
+  const handleCloseModal = useCallback(() => setModalOpen(false), []);
+
+  const taskStyle = useCallback((isDragging) => ({
+    userSelect: 'none',
+    padding: '16px',
+    margin: '0 0 12px 0',
+    minHeight: '50px',
+    backgroundColor: isDragging ? 'var(--accent, #fbbf24)' : 'var(--primary, #2563eb)',
+    color: isDragging ? 'var(--primary, #2563eb)' : '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.10)',
+    cursor: isDragging ? 'grabbing' : 'pointer',
+    fontWeight: 500,
+    fontSize: '1rem',
+    willChange: 'transform, background-color, color',
+    transform: isDragging ? 'scale(1.04)' : 'scale(1)',
+    transition: 'background-color 0.2s ease, color 0.2s ease, transform 0.2s ease'
+  }), []);
+
+  const handleClick = useCallback((e, isDragging) => {
+    if (!isDragging) {
+      e.preventDefault();
+      handleOpenModal();
+    }
+  }, [handleOpenModal]);
 
   return (
     <>
@@ -16,31 +41,34 @@ const Task = ({ task, index }) => {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             ref={provided.innerRef}
-            onClick={handleOpenModal}
+            onClick={(e) => handleClick(e, snapshot.isDragging)}
             style={{
-              userSelect: 'none',
-              padding: '16px',
-              margin: '0 0 12px 0',
-              minHeight: '50px',
-              backgroundColor: snapshot.isDragging ? 'var(--accent, #fbbf24)' : 'var(--primary, #2563eb)',
-              color: snapshot.isDragging ? 'var(--primary, #2563eb)' : '#fff',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(37,99,235,0.10)',
-              cursor: 'pointer',
-              fontWeight: 500,
-              fontSize: '1rem',
-              transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
-              transform: snapshot.isDragging ? 'scale(1.04)' : 'scale(1)',
-              ...provided.draggableProps.style,
+              ...taskStyle(snapshot.isDragging),
+              ...provided.draggableProps.style
             }}
           >
-            {task.name}
+            <div className="task-content">
+              {task.name}
+              {task.priority && (
+                <span className={`task-priority priority-${task.priority.toLowerCase()}`}>
+                  {task.priority}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </Draggable>
-      {isModalOpen && <TaskModal task={task} onClose={handleCloseModal} />}
+      {isModalOpen && (
+        <TaskModal 
+          task={task} 
+          onClose={handleCloseModal} 
+        />
+      )}
     </>
   );
-};
+});
+
+// Add display name for debugging
+Task.displayName = 'Task';
 
 export default Task;

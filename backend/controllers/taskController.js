@@ -2,6 +2,16 @@ const asyncHandler = require('express-async-handler');
 const Task = require('../models/taskModel');
 const Project = require('../models/projectModel');
 const Notification = require('../models/notificationModel');
+const {
+  logTaskCreated,
+  logTaskUpdated,
+  logTaskDeleted,
+  logTaskStatusChanged,
+  logTaskAssigned,
+  logCommentAdded,
+  logFileUploaded,
+  logTimeLogged,
+} = require('./activityLogController');
 
 // @desc    Get tasks for a project
 // @route   GET /api/tasks/:projectId
@@ -9,7 +19,8 @@ const Notification = require('../models/notificationModel');
 const getTasks = asyncHandler(async (req, res) => {
   const tasks = await Task.find({ project: req.params.projectId })
     .populate('comments.user', 'name')
-    .populate('timeTracked.user', 'name');
+    .populate('timeTracked.user', 'name')
+    .populate('attachments');
   res.status(200).json(tasks);
 });
 
@@ -50,6 +61,9 @@ const setTask = asyncHandler(async (req, res) => {
       link: `/project/${task.project}`,
     });
   }
+
+  // Log task creation activity
+  await logTaskCreated(req.user.id, task.project, task.name, req);
 
   res.status(201).json(task);
 });
@@ -148,6 +162,9 @@ const addComment = asyncHandler(async (req, res) => {
     'name'
   );
 
+  // Log comment addition activity
+  await logCommentAdded(req.user.id, task.project, req.params.id, task.name, req);
+
   res.status(201).json(updatedTask.comments);
 });
 
@@ -166,10 +183,15 @@ const uploadAttachment = asyncHandler(async (req, res) => {
     const attachment = {
       filename: req.file.filename,
       path: req.file.path,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
     };
 
     task.attachments.push(attachment);
     await task.save();
+
+    // Log file upload activity
+    await logFileUploaded(req.user.id, task.project, req.params.id, task.name, req.file.filename, req);
 
     res.status(201).json(task.attachments);
   } else {
@@ -203,6 +225,9 @@ const logTime = asyncHandler(async (req, res) => {
     'name'
   );
 
+  // Log time tracking activity
+  await logTimeLogged(req.user.id, task.project, req.params.id, task.name, time / 60, req);
+
   res.status(201).json(updatedTask.timeTracked);
 });
 
@@ -215,7 +240,11 @@ const getMyTasks = asyncHandler(async (req, res) => {
   const projectIds = projects.map(project => project._id);
 
   // Find all tasks in those projects
-  const tasks = await Task.find({ project: { $in: projectIds } }).populate('project', 'name');
+  const tasks = await Task.find({ project: { $in: projectIds } })
+    .populate('project', 'name')
+    .populate('comments.user', 'name')
+    .populate('timeTracked.user', 'name')
+    .populate('attachments');
 
   res.status(200).json(tasks);
 });
